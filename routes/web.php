@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\PlanoController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SocialAuthController;
+use App\Http\Middleware\IsAdmin;
 
 Route::get('/', function () {
     return view('welcome');
@@ -11,7 +13,13 @@ Route::get('/', function () {
 Route::get('auth/{provider}', [SocialAuthController::class, 'redirectToProvider']);
 Route::get('auth/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback']);
 
-
+Route::middleware(['auth', IsAdmin::class])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/', fn () => view('admin.dashboard'))->name('dashboard');
+        Route::resource('planos', PlanoController::class);
+    });
 
 Route::get('/dashboard', function () {
     return view('dashboard');
